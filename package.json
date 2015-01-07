@@ -1,0 +1,24 @@
+{
+  "name": "tools",
+  "version": "0.0.2",
+  "description": "AWS Lambda function deployment tool",
+  "main": "mutton.js",
+  "dependencies": {
+    "async": "^0.9.0",
+    "aws-sdk": "^2.1.4",
+    "cli-color": "^0.3.2",
+    "commander": "^2.5.1",
+    "config": "^1.9.0",
+    "fs-readdir-recursive": "^0.1.0",
+    "js-yaml": "^3.2.5",
+    "lodash": "^2.4.1",
+    "mkdirp": "^0.5.0",
+    "wrench": "^1.5.8"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Cascade Energy, Inc.",
+  "license": "Proprietary"
+}
