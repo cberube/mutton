@@ -4,6 +4,16 @@
   "description": "AWS Lambda function deployment tool",
   "main": "mutton.js",
   "bin": "mutton.js",
+  "preferGlobal": true,
+  "author": "Cascade Energy, Inc.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:CascadeEnergy/mutton.git"
+  },
+  "scripts": {
+    "test": "gulp test"
+  },
   "dependencies": {
     "async": "^0.9.0",
     "aws-sdk": "^2.1.4",
@@ -21,10 +31,5 @@
     "proxyquire": "^1.3.0",
     "should": "^4.4.2",
     "sinon": "^1.12.2"
-  },
-  "scripts": {
-    "test": "gulp test"
-  },
-  "author": "Cascade Energy, Inc.",
-  "license": "Proprietary"
+  }
 }
