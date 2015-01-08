@@ -4,7 +4,6 @@ var async = require('async');
 var AWS = require('aws-sdk');
 var config = require('config');
 var fs = require('fs');
-var program = require('commander');
 
 var muttonConfig = config.get('mutton');
 
@@ -13,7 +12,7 @@ var deployPath = fs.realpathSync(muttonConfig.deployPath);
 
 AWS.config.region = muttonConfig.aws.region;
 
-var deployment = require('./lib/deployment.js')(AWS);
+var deployment = require('./lib/deployment.js');
 var files = require('./lib/files.js')(sourcePath, deployPath);
 
 console.log('Source path: ' + sourcePath);
