@@ -6,7 +6,7 @@ var proxyquire = require('proxyquire');
 var sinon = require('sinon');
 require('should');
 
-describe('File handling library', function() {
+describe('Library: File support', function() {
   var files;
   var fs;
   var _;

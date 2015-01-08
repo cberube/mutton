@@ -6,7 +6,7 @@ var proxyquire = require('proxyquire');
 var sinon = require('sinon');
 require('should');
 
-describe('Mutton', function() {
+describe('Mutton entry point', function() {
   var commanderStub;
 
   beforeEach(function() {
