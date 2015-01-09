@@ -73,7 +73,7 @@ describe('Library: Deployment support', function() {
         mkdirp.sync.args[0][0].should.equal('dir-name');
 
         childProcess.exec.callCount.should.equal(1);
-        should.equal(childProcess.exec.args[0][0], 'zip -r archive-path .');
+        should.equal(childProcess.exec.args[0][0], 'zip -rq archive-path .');
         should.deepEqual(childProcess.exec.args[0][1], { cwd: 'source-path' });
         should.equal(childProcess.exec.args[0][2], 'partial-right');
 
