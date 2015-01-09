@@ -73,14 +73,14 @@ describe('Library: Deployment support', function() {
         mkdirp.sync.args[0][0].should.equal('dir-name');
 
         childProcess.exec.callCount.should.equal(1);
-        childProcess.exec.args[0][0].should.equal('zip -r archive-path .');
-        childProcess.exec.args[0][1].should.eql({ cwd: 'source-path' });
-        childProcess.exec.args[0][2].should.equal('partial-right');
+        should.equal(childProcess.exec.args[0][0], 'zip -r archive-path .');
+        should.deepEqual(childProcess.exec.args[0][1], { cwd: 'source-path' });
+        should.equal(childProcess.exec.args[0][2], 'partial-right');
 
         lodash.partialRight.callCount.should.equal(1);
-        lodash.partialRight.args[0][0].should.equal(deployment._zipComplete);
-        lodash.partialRight.args[0][1].should.equal(functionDetails);
-        lodash.partialRight.args[0][2].should.equal('callback');
+        should.equal(lodash.partialRight.args[0][0], deployment._zipComplete);
+        should.equal(lodash.partialRight.args[0][1], functionDetails);
+        should.equal(lodash.partialRight.args[0][2], 'callback');
       }
     );
   });
@@ -116,8 +116,8 @@ describe('Library: Deployment support', function() {
       deployment.uploadFunction(details, 'callback');
 
       lambda.uploadFunction.callCount.should.equal(1);
-      lambda.uploadFunction.args[0][0].should.eql(expectedParameters);
-      lambda.uploadFunction.args[0][1].should.equal('callback');
+      should.deepEqual(lambda.uploadFunction.args[0][0], expectedParameters);
+      should.equal(lambda.uploadFunction.args[0][1], 'callback');
     });
   });
 
@@ -156,7 +156,7 @@ describe('Library: Deployment support', function() {
 
       callback.callCount.should.equal(1);
       should.not.exist(callback.args[0][0]);
-      callback.args[0][1].should.eql(expectedConfig);
+      should.deepEqual(callback.args[0][1], expectedConfig);
     });
   });
 

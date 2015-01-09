@@ -7,15 +7,13 @@ var sinon = require('sinon');
 var should = require('should');
 
 describe('Library: File support', function() {
+  var _;
   var files;
   var fs;
   var glob;
-  var _;
   var path;
 
   beforeEach(function() {
-    var filesFactory;
-
     _ = { filter: sinon.stub(), map: sinon.stub(), partial: sinon.stub() };
 
     fs = {
