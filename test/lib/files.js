@@ -4,18 +4,19 @@
 
 var proxyquire = require('proxyquire');
 var sinon = require('sinon');
-require('should');
+var should = require('should');
 
 describe('Library: File support', function() {
   var files;
   var fs;
+  var glob;
   var _;
-  var wrench;
+  var path;
 
   beforeEach(function() {
     var filesFactory;
 
-    _ = { filter: sinon.stub(), map: sinon.stub() };
+    _ = { filter: sinon.stub(), map: sinon.stub(), partial: sinon.stub() };
 
     fs = {
       statSync: sinon.stub(),
@@ -23,18 +24,25 @@ describe('Library: File support', function() {
       realpathSync: sinon.stub()
     };
 
-    wrench = { readdirSyncRecursive: sinon.stub() };
+    glob = {
+      sync: sinon.stub()
+    };
+
+    path = {
+      basename: sinon.stub(),
+      join: sinon.stub(),
+      relative: sinon.stub()
+    };
 
     filesFactory = proxyquire(
       '../../lib/files.js',
-      {  lodash: _, fs: fs, wrench: wrench }
+      {  lodash: _, fs: fs, glob: glob, path: path }
     );
-    files = filesFactory('base-path', 'deploy-path');
+
+    files = filesFactory('deploy-path');
   });
 
   describe('_isLambdaDirectory', function() {
-    var completePath = 'base-path/relative-path';
-    var configFilePath = completePath + '/lambda.json';
     var stat;
 
     beforeEach(function() {
@@ -45,70 +53,87 @@ describe('Library: File support', function() {
 
     afterEach(function() {
       fs.statSync.callCount.should.equal(1);
-      fs.statSync.args[0][0].should.equal(completePath);
+      fs.statSync.args[0][0].should.equal('complete-path');
 
       stat.isDirectory.callCount.should.equal(1);
     });
 
     it('returns true if a path is a directory with a config file', function() {
+      path.join.returns('path-join');
+
       stat.isDirectory.returns(true);
       fs.existsSync.returns(true);
 
-      files._isLambdaDirectory('relative-path').should.be.true;
+      files._isLambdaDirectory('complete-path').should.be.true;
 
       fs.existsSync.callCount.should.equal(1);
-      fs.existsSync.args[0][0].should.equal(configFilePath);
+      should.equal(fs.existsSync.args[0][0], 'path-join');
     });
 
     it('returns false if the path is not a directory', function() {
       stat.isDirectory.returns(false);
 
-      files._isLambdaDirectory('relative-path').should.be.false;
+      files._isLambdaDirectory('complete-path').should.be.false;
+
+      fs.statSync.callCount.should.equal(1);
+      should.equal(fs.statSync.args[0][0], 'complete-path');
 
       fs.existsSync.callCount.should.equal(0);
     });
 
     it('returns false if the path has no config file', function() {
+      path.join.returns('path-join');
+
       stat.isDirectory.returns(true);
       fs.existsSync.returns(false);
 
-      files._isLambdaDirectory('relative-path').should.be.false;
+      files._isLambdaDirectory('complete-path').should.be.false;
 
       fs.existsSync.callCount.should.equal(1);
-      fs.existsSync.args[0][0].should.equal(configFilePath);
+      fs.existsSync.args[0][0].should.equal('path-join');
     });
   });
 
   describe('_prepareFunctionDetails', function() {
     it('should generate basic function details', function() {
-      fs.realpathSync.returns('source-path');
+      path.relative.returns('relative-path');
+      path.basename.returns('base-name');
+      path.join.returns('path-join');
 
-      files._prepareFunctionDetails('function-name').should.eql(
+      fs.realpathSync.returns('real-path');
+
+      should.deepEqual(
+        files._prepareFunctionDetails(
+          'base-path',
+          'deploy-path',
+          'source-path'
+        ),
         {
-          functionName: 'function-name',
           sourcePath: 'source-path',
-          archivePath: 'deploy-path/function-name.zip',
+          archivePath: 'path-join',
           configPath: 'source-path/lambda.json'
         }
       );
 
-      fs.realpathSync.callCount.should.equal(1);
-      fs.realpathSync.args[0][0].should.equal('base-path/function-name');
+      path.relative.callCount.should.equal(1);
+      should.equal(path.relative.args[0][0], 'base-path');
+      should.equal(path.relative.args[0][1], 'source-path');
+
+      path.join.callCount.should.equal(1);
+      should.equal(path.join.args[0][0], 'deploy-path');
+      should.equal(path.join.args[0][1], 'relative-path.zip');
     });
   });
 
   describe('_getLambdaDirectoryList', function() {
     it('should return a list of Lambda source directories', function() {
-      wrench.readdirSyncRecursive.returns('dir-list');
+      glob.sync.returns('glob-sync');
       _.filter.returns('filter-return');
 
       files._getLambdaDirectoryList('base-path').should.equal('filter-return');
 
-      wrench.readdirSyncRecursive.callCount.should.equal(1);
-      wrench.readdirSyncRecursive.args[0][0].should.equal('base-path');
-
       _.filter.callCount.should.equal(1);
-      _.filter.args[0][0].should.equal('dir-list');
+      _.filter.args[0][0].should.equal('glob-sync');
       _.filter.args[0][1].should.equal(files._isLambdaDirectory);
     });
   });
@@ -116,15 +141,20 @@ describe('Library: File support', function() {
   describe('getFunctionDetailsList', function() {
     it('should generate details for all lambda directories', function() {
       _.map.returns('map-return');
+      _.partial.returns('partial');
 
       files._getLambdaDirectoryList = sinon.stub();
       files._getLambdaDirectoryList.returns('dir-list');
 
       files.getFunctionDetailsList('base-path').should.equal('map-return');
 
+      _.partial.callCount.should.equal(1);
+      should.equal(_.partial.args[0][0], files._prepareFunctionDetails);
+      should.equal(_.partial.args[0][1], 'base-path');
+
       _.map.callCount.should.equal(1);
-      _.map.args[0][0].should.equal('dir-list');
-      _.map.args[0][1].should.equal(files._prepareFunctionDetails);
+      should.equal(_.map.args[0][0], 'dir-list');
+      should.equal(_.map.args[0][1], 'partial');
     });
   });
 });

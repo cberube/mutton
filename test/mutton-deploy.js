@@ -4,7 +4,7 @@
 
 var proxyquire = require('proxyquire');
 var sinon = require('sinon');
-require('should');
+var should = require('should');
 
 describe('Mutton deploy sub-command', function() {
   var configData = {
@@ -22,6 +22,7 @@ describe('Mutton deploy sub-command', function() {
   var deployment;
   var files;
   var filesFactory;
+  var commander;
 
   function requireTestSubject() {
     proxyquire(
@@ -32,7 +33,8 @@ describe('Mutton deploy sub-command', function() {
         config: config,
         fs: fs,
         './lib/deployment.js': deployment,
-        './lib/files.js': filesFactory
+        './lib/files.js': filesFactory,
+        commander: commander
       }
     );
   }
@@ -47,6 +49,7 @@ describe('Mutton deploy sub-command', function() {
       complete: 'complete'
     };
     files = { getFunctionDetailsList: sinon.stub() };
+    commander = { parse: sinon.stub(), args: [ ] };
 
     filesFactory = sinon.stub();
     filesFactory.returns(files);
@@ -84,15 +87,13 @@ describe('Mutton deploy sub-command', function() {
     aws.config.region.should.equal('aws-region');
   });
 
-  it('should inject the work paths into the files factory', function() {
+  it('should inject the deploy path into the files factory', function() {
     fs.realpathSync.onCall(0).returns('real-source-path');
     fs.realpathSync.onCall(1).returns('real-deploy-path');
 
     requireTestSubject();
 
     filesFactory.callCount.should.equal(1);
-    filesFactory.args[0][0].should.equal('real-source-path');
-    filesFactory.args[0][1].should.equal('real-deploy-path');
   });
 
   it('should log configuration information', function() {
@@ -101,10 +102,11 @@ describe('Mutton deploy sub-command', function() {
 
     requireTestSubject();
 
-    console.log.callCount.should.equal(3);
-    console.log.args[0][0].should.equal('Source path: real-source-path');
-    console.log.args[1][0].should.equal('Deploy path: real-deploy-path');
-    console.log.args[2][0].should.equal('Target region: aws-region');
+    console.log.callCount.should.equal(4);
+    console.log.args[0][0].should.equal('Path filter: **');
+    console.log.args[1][0].should.equal('Source path: real-source-path');
+    console.log.args[2][0].should.equal('Deploy path: real-deploy-path');
+    console.log.args[3][0].should.equal('Target region: aws-region');
   });
 
   it('should process a list of function details', function() {

@@ -33,7 +33,7 @@ describe('Mutton entry point', function() {
 
   it('should configure the deploy sub-command', function() {
     commanderStub.command.callCount.should.equal(1);
-    commanderStub.command.args[0][0].should.equal('deploy');
+    commanderStub.command.args[0][0].should.equal('deploy [filter]');
   });
 
   it('should parse the incoming arguments', function() {
