@@ -1,0 +1,5 @@
+mutton:
+  sourcePath: /var/mutton/source/
+  deployPath: /var/mutton/deploy/
+  aws:
+    region: us-west-2
