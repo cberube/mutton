@@ -3,7 +3,10 @@
   "version": "0.0.4",
   "description": "AWS Lambda function deployment tool",
   "main": "mutton.js",
-  "bin": [ "./mutton.js", "./mutton-deploy.js" ],
+  "bin": {
+    "mutton": "./mutton.js",
+    "mutton-deploy": "./mutton-deploy.js"
+  },
   "preferGlobal": true,
   "author": "Cascade Energy, Inc.",
   "license": "MIT",
