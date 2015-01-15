@@ -17,6 +17,8 @@ var sourcePath = fs.realpathSync(muttonConfig.sourcePath);
 var deployPath = fs.realpathSync(muttonConfig.deployPath);
 var pathFilter;
 
+deployment.config.variables = muttonConfig.variables;
+
 program.parse(process.argv);
 pathFilter = program.args[0] || '**';
 
