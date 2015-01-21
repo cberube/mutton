@@ -128,35 +128,35 @@ describe('Library: Deployment support', function() {
     beforeEach(function() {
       callback = sinon.spy();
       details = { configPath: 'config-path' };
-      sinon.stub(JSON, 'parse');
-    });
 
-    afterEach(function() {
-      JSON.parse.restore();
+      fs.readFileSync = sinon.stub();
     });
 
     it('should propagate an error if JSON parsing fails', function() {
-
-      JSON.parse.throws('exception');
+      fs.readFileSync.returns('!');
 
       deployment.loadConfigurationFile(details, callback);
 
       callback.callCount.should.equal(1);
       callback.args[0][0].should.equal(
-        'Failed to parse configuration file config-path\n\texception'
+        'Failed to parse configuration file config-path\n' +
+        '\tSyntaxError: Unexpected token !'
       );
     });
 
     it('should update the details with the config data', function() {
-      var expectedConfig = { configPath: 'config-path', config: 'config' };
+      var config = { foo: 'bar', baz: 'qux' };
 
-      JSON.parse.returns('config');
+      fs.readFileSync.returns(JSON.stringify(config));
 
       deployment.loadConfigurationFile(details, callback);
 
       callback.callCount.should.equal(1);
       should.not.exist(callback.args[0][0]);
-      should.deepEqual(callback.args[0][1], expectedConfig);
+      should.deepEqual(
+        callback.args[0][1],
+        { configPath: 'config-path', config: config }
+      );
     });
   });
 

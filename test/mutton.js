@@ -4,7 +4,7 @@
 
 var proxyquire = require('proxyquire');
 var sinon = require('sinon');
-require('should');
+var should = require('should');
 
 describe('Mutton entry point', function() {
   var commanderStub;
@@ -32,8 +32,15 @@ describe('Mutton entry point', function() {
   });
 
   it('should configure the deploy sub-command', function() {
-    commanderStub.command.callCount.should.equal(1);
-    commanderStub.command.args[0][0].should.equal('deploy [filter]');
+    commanderStub.command.callCount.should.equal(2);
+    should(commanderStub.command.args[0][0]).equal('deploy [filter]');
+  });
+
+  it('should configure the test sub-command', function() {
+    commanderStub.command.callCount.should.equal(2);
+    should(commanderStub.command.args[1][0]).equal(
+      'test [functionName] [eventSource]'
+    );
   });
 
   it('should parse the incoming arguments', function() {
