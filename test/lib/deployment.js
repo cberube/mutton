@@ -14,6 +14,7 @@ var fs = { };
 var lambda = { };
 var lodash = { };
 var mkdirp = { };
+var mustache = { };
 var path = { };
 
 AWS.Lambda.returns(lambda);
@@ -27,6 +28,7 @@ var deployment = proxyquire(
     lodash: lodash,
     fs: fs,
     mkdirp: mkdirp,
+    mustache: mustache,
     path: path
   }
 );
@@ -42,6 +44,21 @@ describe('Library: Deployment support', function() {
       callback.callCount.should.equal(1);
       callback.args[0][0].should.equal('error');
       callback.args[0][1].should.equal(details);
+    });
+  });
+
+  describe('_replaceVariables', function() {
+    it('should do nothing if the template is not a string', function() {
+      should(deployment._replaceVariables(42)).equal(42);
+    });
+
+    it('should use mustache to render string templates', function() {
+      mustache.render = sinon.stub().returns('render');
+
+      should(deployment._replaceVariables('template')).equal('render');
+
+      mustache.render.callCount.should.equal(1);
+      should(mustache.render.args[0][0]).equal('template');
     });
   });
 
@@ -146,6 +163,10 @@ describe('Library: Deployment support', function() {
 
     it('should update the details with the config data', function() {
       var config = { foo: 'bar', baz: 'qux' };
+
+      mustache.render = sinon.stub();
+      mustache.render.onFirstCall().returns('bar');
+      mustache.render.onSecondCall().returns('qux');
 
       fs.readFileSync.returns(JSON.stringify(config));
 
