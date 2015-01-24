@@ -5,6 +5,7 @@
   "main": "mutton.js",
   "bin": {
     "mutton": "./mutton.js",
+    "mutton-config": "./mutton-config.js",
     "mutton-deploy": "./mutton-deploy.js",
     "mutton-test": "./mutton-test.js"
   },
