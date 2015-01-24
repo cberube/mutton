@@ -1,9 +1,0 @@
-mutton:
-  sourcePath: /var/mutton/source/
-  deployPath: /var/mutton/deploy/
-  aws:
-    region: us-west-2
-  variables:
-    accountId: 000000000000
-    region: us-west-2
-    bucketPrefix: developer-

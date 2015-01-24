@@ -3,17 +3,21 @@
 var _ = require('lodash');
 var async = require('async');
 var AWS = require('aws-sdk');
-var config = require('config');
 var files = require('./lib/files.js');
 var program = require('commander');
 var moment = require('moment-timezone');
 var eventLoader = require('./lib/eventLoader');
+var nconf = require('nconf');
+
+nconf.file('user', process.env.HOME + '/mutton.conf.json');
+nconf.env().argv();
+nconf.defaults({ mutton: { deployPath: '/tmp' } });
+
+var muttonConfig = nconf.get('mutton');
 
 var outputHelper = require('./lib/outputHelper');
 var invocationHelperFactory = require('./lib/invocationHelperFactory');
 var invocationHelper;
-
-var muttonConfig = config.get('mutton');
 
 AWS.config.region = muttonConfig.aws.region;
 
@@ -49,7 +53,7 @@ event = eventLoader.loadEventTemplate(
   eventTemplatePath,
   deployment.config.variables
 );
-outputHelper.displayBlock('Event object', event);
+outputHelper.displayBlock('Event object', JSON.stringify(event));
 
 function monitorExecution(invocationTask, callback) {
   async.series(

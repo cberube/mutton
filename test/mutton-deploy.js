@@ -9,7 +9,7 @@ var should = require('should');
 describe('Mutton deploy sub-command', function() {
   var async;
   var aws;
-  var config;
+  var nconf;
   var commander;
   var deployment = { processFunction: 'process', complete: 'complete' };
   var fs;
@@ -27,15 +27,21 @@ describe('Mutton deploy sub-command', function() {
   beforeEach(function() {
     async = { each: sinon.stub() };
     aws = { config: { } };
-    config = { get: sinon.stub() };
+    nconf = {
+      argv: sinon.spy(),
+      defaults: sinon.spy(),
+      env: sinon.spy(),
+      file: sinon.spy(),
+      get: sinon.stub()
+    };
     commander = { parse: sinon.stub(), args: [ ] };
     files = { getFunctionDetailsList: sinon.stub() };
     fs = { realpathSync: sinon.stub() };
 
-    config.get.returns(configData);
+    nconf.get.returns(configData);
 
-    fs.realpathSync.onCall(0).returns('real-source-path');
-    fs.realpathSync.onCall(1).returns('real-deploy-path');
+    fs.realpathSync.onCall(0).returns('real-deploy-path');
+    fs.realpathSync.onCall(1).returns('real-source-path');
 
     files.getFunctionDetailsList.returns(functionDetailList);
 
@@ -47,7 +53,7 @@ describe('Mutton deploy sub-command', function() {
         async: async,
         'aws-sdk': aws,
         commander: commander,
-        config: config,
+        nconf: nconf,
         fs: fs,
         './lib/deployment.js': deployment,
         './lib/files.js': files
@@ -60,14 +66,14 @@ describe('Mutton deploy sub-command', function() {
   });
 
   describe('Configuration process', function() {
-    it('should use config to gather configuration data', function() {
-      config.get.callCount.should.equal(1);
+    it('should use nconf to gather configuration data', function() {
+      nconf.get.callCount.should.equal(1);
     });
 
     it('should request the real path to the work directories', function() {
       fs.realpathSync.callCount.should.equal(2);
-      should.equal(fs.realpathSync.args[0][0], 'source-path');
-      should.equal(fs.realpathSync.args[1][0], 'deploy-path');
+      should.equal(fs.realpathSync.args[0][0], 'deploy-path');
+      should.equal(fs.realpathSync.args[1][0], '.');
     });
 
     it('should configure the AWS region', function() {

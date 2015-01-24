@@ -31,14 +31,23 @@ describe('Mutton entry point', function() {
     commanderStub.version.args[0][0].should.equal('0.0.2');
   });
 
+  it('should configure the config sub-command', function() {
+    commanderStub.command.callCount.should.equal(3);
+    should(commanderStub.command.args[0][0]).equal(
+      'config'
+    );
+  });
+
   it('should configure the deploy sub-command', function() {
-    commanderStub.command.callCount.should.equal(2);
-    should(commanderStub.command.args[0][0]).equal('deploy [filter]');
+    commanderStub.command.callCount.should.equal(3);
+    should(commanderStub.command.args[1][0]).equal(
+      'deploy [basePath] [filter]'
+    );
   });
 
   it('should configure the test sub-command', function() {
-    commanderStub.command.callCount.should.equal(2);
-    should(commanderStub.command.args[1][0]).equal(
+    commanderStub.command.callCount.should.equal(3);
+    should(commanderStub.command.args[2][0]).equal(
       'test [functionName] [eventSource]'
     );
   });

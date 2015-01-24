@@ -5,7 +5,8 @@
   "main": "mutton.js",
   "bin": {
     "mutton": "./mutton.js",
-    "mutton-deploy": "./mutton-deploy.js"
+    "mutton-deploy": "./mutton-deploy.js",
+    "mutton-test": "./mutton-test.js"
   },
   "preferGlobal": true,
   "author": "Cascade Energy, Inc.",
@@ -21,13 +22,13 @@
     "async": "^0.9.0",
     "aws-sdk": "^2.1.4",
     "commander": "^2.5.1",
-    "config": "^1.9.0",
     "glob": "^4.3.2",
     "js-yaml": "^3.2.5",
     "lodash": "^2.4.1",
     "mkdirp": "^0.5.0",
     "moment-timezone": "^0.3.0",
-    "mustache": "^1.0.0"
+    "mustache": "^1.0.0",
+    "nconf": "^0.7.1"
   },
   "devDependencies": {
     "gulp": "^3.8.10",

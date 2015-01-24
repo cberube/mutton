@@ -70,15 +70,37 @@ describe('Library: CloudWatch log stream locator service', function() {
   });
 
   describe('_logStreamFound', function() {
-    it('should pass the log stream value to the callback', function() {
-      var callback = sinon.spy();
+    var callback;
 
+    beforeEach(function() {
+      callback = sinon.spy();
+
+      sinon.stub(process, 'exit');
+      sinon.stub(console, 'error');
+    });
+
+    afterEach(function() {
+      console.error.restore();
+      process.exit.restore();
+    });
+
+    it('should pass the log stream value to the callback', function() {
       logStreamLocator._logStreamForRequestId = 'stream';
       logStreamLocator._logStreamFound(callback);
 
       callback.callCount.should.equal(1);
       should(callback.args[0][0]).equal(null);
       should(callback.args[0][1]).equal('stream');
+    });
+
+    it('should emit a message and exit the process on error', function() {
+      logStreamLocator._logStreamFound(callback, 'error');
+
+      console.error.callCount.should.equal(1);
+      should(console.error.args[0][0]).equal('error');
+
+      process.exit.callCount.should.equal(1);
+      should(process.exit.args[0][0]).equal(1);
     });
   });
 
@@ -276,7 +298,7 @@ describe('Library: CloudWatch log stream locator service', function() {
         should(lodash.partial.args[0][1]).equal(
           logStreamLocator._checkForStartEvent
         );
-        should(lodash.partial.args[0][2]).equal(1000);
+        should(lodash.partial.args[0][2]).equal(5000);
 
         should(lodash.partial.args[1][0]).equal(
           logStreamLocator._logStreamFound
