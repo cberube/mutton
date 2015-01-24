@@ -1,6 +1,6 @@
 {
   "name": "mutton",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "description": "AWS Lambda function deployment tool",
   "main": "mutton.js",
   "bin": {
