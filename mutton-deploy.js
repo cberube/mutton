@@ -7,7 +7,7 @@ var program = require('commander');
 var files = require('./lib/files.js');
 var nconf = require('nconf');
 
-nconf.file('user', process.env.HOME + '/mutton.conf.json');
+nconf.file('user', process.env.HOME + '/.mutton/conf.json');
 nconf.env();
 nconf.argv();
 nconf.defaults({ mutton: { deployPath: '/tmp' } });

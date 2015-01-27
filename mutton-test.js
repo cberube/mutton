@@ -3,36 +3,37 @@
 var _ = require('lodash');
 var async = require('async');
 var AWS = require('aws-sdk');
-var files = require('./lib/files.js');
-var program = require('commander');
-var moment = require('moment-timezone');
+var deployment = require('./lib/deployment.js');
 var eventLoader = require('./lib/eventLoader');
+var files = require('./lib/files.js');
+var invocationHelperFactory = require('./lib/invocationHelperFactory');
+var moment = require('moment-timezone');
 var nconf = require('nconf');
+var outputHelper = require('./lib/outputHelper');
+var program = require('commander');
 
-nconf.file('user', process.env.HOME + '/mutton.conf.json');
+var event;
+var eventTemplatePath;
+var functionName;
+var invocationHelper;
+var muttonConfig;
+
+// Gather configuration data and setup internal configuration objects
+nconf.file('user', process.env.HOME + '/.mutton/conf.json');
 nconf.env().argv();
 nconf.defaults({ mutton: { deployPath: '/tmp' } });
 
-var muttonConfig = nconf.get('mutton');
-
-var outputHelper = require('./lib/outputHelper');
-var invocationHelperFactory = require('./lib/invocationHelperFactory');
-var invocationHelper;
+muttonConfig = nconf.get('mutton');
 
 AWS.config.region = muttonConfig.aws.region;
-
-invocationHelper = invocationHelperFactory();
-
-var deployment = require('./lib/deployment.js');
-
 deployment.config.variables = muttonConfig.variables;
 
+// Gather command-line parameters
 program.parse(process.argv);
+functionName = program.args[0];
+eventTemplatePath = program.args[1];
 
-var event;
-
-var functionName = program.args[0];
-var eventTemplatePath = program.args[1];
+invocationHelper = invocationHelperFactory();
 
 function displayEvents(invocationTask, callback) {
   console.log('\n--------------------------------------------------\n');

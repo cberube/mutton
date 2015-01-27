@@ -4,14 +4,19 @@ var _ = require('lodash');
 var async = require('async');
 var AWS = require('aws-sdk');
 var files = require('./lib/files.js');
+var fs = require('fs');
 var nconf = require('nconf');
 
-var configurationPath = process.env.HOME + '/mutton.conf.json';
+var configurationDirectory = process.env.HOME + '/.mutton';
+var configurationPath = configurationDirectory + '/conf.json';
 var defaultConfig = {
   deployPath: '/tmp',
   aws: { region: 'us-west-2' },
   variables: { }
 };
+
+// Ensure the target directory exists (mode is 0755)
+fs.mkdirSync(configurationDirectory, 493);
 
 nconf.file({ file: configurationPath });
 nconf.merge('mutton', _.extend(defaultConfig, nconf.get('mutton')));
